@@ -26,7 +26,8 @@ function ShowH(csrf_token, supplier_id){
         var return_arr = NewArray[1].split(",");
         return_arr.forEach(function(e){ 
             var r_arr = e.split(":");
-                display_v += '<option value="'+r_arr[0]+'" >'+r_arr[1]+'</option>';
+            if(display_v == '') display_v += '<option value="" >無</option>';
+            display_v += '<option value="'+r_arr[0]+'" >'+r_arr[1]+'</option>';
         })
     }
     
@@ -52,6 +53,7 @@ function ShowR(csrf_token, hotel_id){
         var return_arr = NewArray[1].split(",");
         return_arr.forEach(function(e){ 
             var r_arr = e.split(":");
+            if(display_v == '') display_v += '<option value="" >無</option>';
             display_v += '<option value="'+r_arr[0]+'" >'+r_arr[1]+'</option>';
         })
     }
@@ -73,7 +75,6 @@ function ShowA(csrf_token, Room_id){
     xmlHttp.send(Send_Str);
 
     var NewArray = xmlHttp.responseText.split("@!@");
-    alert(NewArray[1]);
     if(NewArray[1]!=''){
         display_v = NewArray[1];
     }

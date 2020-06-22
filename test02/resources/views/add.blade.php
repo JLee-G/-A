@@ -7,6 +7,18 @@
     <title>新增資料用頁面</title>
 </head>
 <body>
+
+<span style="color:blue;" onclick="Show(4)">新增供應商：</span>
+<div id="Show_4" style="display:none">
+    <form method="post" action="{{ url('/supplier_add') }}">
+        {{ csrf_field() }}
+        供應商名稱：<input type='text' name="supplier_name" id="supplier_name" value="" required="required" >
+        供應商電話：<input type='text' name="supplier_phone" id="supplier_phone" value="" required="required" >
+        供應商地址：<input type='text' name="supplier_address" id="supplier_address" value="" required="required" >
+        <button>送出</button>
+    </form>
+</div>
+
 <span style="color:blue;" onclick="Show(1)">新增飯店：</span>
 <div id="Show_1" style="display:none">
     <form method="post" action="{{ url('/hotel_add') }}">
