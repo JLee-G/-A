@@ -49,6 +49,7 @@ function ShowR(csrf_token, hotel_id){
 
 
     var NewArray = xmlHttp.responseText.split("@!@");
+    
     if(NewArray[1]!=''){
         var return_arr = NewArray[1].split(",");
         return_arr.forEach(function(e){ 
@@ -80,4 +81,48 @@ function ShowA(csrf_token, Room_id){
     }
     
     document.getElementById('test_9').innerHTML = display_v;
+}
+
+//查詢訂單資訊
+function order_inquire(csrf_token){
+
+    var display_v = '';
+    var order_number_v = document.getElementById("order_number").value;
+
+    //傳送資料
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("POST",'./order_inquire', false);
+    xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    var Send_Str =  '_token='+csrf_token+
+                    '&order_number='+order_number_v;
+    xmlHttp.send(Send_Str);
+
+    var NewArray = xmlHttp.responseText.split("@!@");
+    if(NewArray[1]!=''){
+        var return_arr = NewArray[1].split(",");
+        return_arr.forEach(function(e){ 
+            var r_arr = e.split(":::");
+            display_v += '<br/>id='+r_arr[0]+'<br/>飯店ID='+r_arr[1]+'<br/>訂房客戶ID='+r_arr[2]+'<br/>房型='+r_arr[3]+'<br/>價格='+r_arr[4]+'<br/>幣別='+r_arr[5];
+        })
+    }
+    
+    document.getElementById('test_5').innerHTML = display_v;
+
+}
+
+//用金額ID查詢
+function amount_inquire(){
+
+    var display_v = '';
+
+    var amount_id_v = document.getElementById("amount_id").value;
+
+    //傳送資料
+    var xmlHttp = new XMLHttpRequest();
+    xmlHttp.open("POST",'./amount_inquire', false);
+    xmlHttp.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
+    var Send_Str =  '_token='+csrf_token+
+                    '&amount_id='+amount_id_v;
+    xmlHttp.send(Send_Str);
+    
 }

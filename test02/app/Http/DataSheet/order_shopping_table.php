@@ -32,6 +32,6 @@ class order_shopping_table extends Model
 
         $relatedModel = amount::class;
 
-        return $this->belongsToMany($relatedModel, $pivotTable, 'order_shopping_table_id', 'amount_id')->withTimestamps();
+        return $this->belongsToMany($relatedModel, $pivotTable, 'order_shopping_table_id', 'amount_id')->withTimestamps()->withPivot(['Type']);
     }
 }

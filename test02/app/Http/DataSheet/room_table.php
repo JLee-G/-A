@@ -11,6 +11,7 @@ class room_table extends Model
                                 'supplier_hotel_id',
                                 'room_test',
                                 'amount',
-                                'currency'
+                                'currency',
+                                'room_type'
                             ];
 }

@@ -21,6 +21,16 @@ class order_table extends Model
         return $this->belongsToMany($relatedModel, $pivotTable, 'Order_id', 'shopping_id')->withTimestamps()->withPivot(['Type','Group_number']);
     }
 
+    public function hotel_shoppings()
+    {
+        $pivotTable = 'order_shopping_table';
+
+        $relatedModel = hotel_shopping::class;
+
+        return $this->belongsToMany($relatedModel, $pivotTable, 'Order_id', 'shopping_id')->withTimestamps()->withPivot(['Type','id']);
+    }
+
+
     public function classifications()
     {
         $pivotTable = 'order_shopping_table';

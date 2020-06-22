@@ -20,6 +20,10 @@ use App\Http\DataSheet\supplier;
 use App\Http\DataSheet\supplier_hotel;
 use App\Http\DataSheet\room_table;
 use App\Http\DataSheet\currency_table;
+use App\Http\DataSheet\client_table;
+use App\Http\DataSheet\hotel_shopping;
+use App\Http\DataSheet\room_type;
+
 
 
 use Requests;
@@ -56,7 +60,9 @@ class test01 extends Controller
         $return_v['hotel_all'] = $this->hotel_company_all();
         $return_v['supplier_all'] = $this->supplier_all();
         $return_v['currency_all'] = $this->currency_all();
-
+        $return_v['client_all'] = $this->client_all();
+        $return_v['room_type_all'] = $this->room_type_all();
+        
         return view('add',$return_v);
     }
 
@@ -70,12 +76,12 @@ class test01 extends Controller
         if(count($posts) != 0){
             foreach($posts as $value){
                 //檢查此供應商是否已經新增過此飯店
-                $posts2 = supplier_hotel::whereRaw(" hotel_id = '".$value->id."' AND supplier_id = '".$request->input("supplieer_id")."' ")->get()->take(1);
+                $posts2 = supplier_hotel::whereRaw(" hotel_id = '".$value->id."' AND supplier_id = '".$request->input("supplier_id")."' ")->get()->take(1);
                 if(count($posts2) == 0){
                     $supplier_hotel = new supplier_hotel;
                     $supplier_hotel->hotel_id = $value->id;
-                    $supplier_hotel->supplier_id = $request->input("supplieer_id");
-                    $supplier_hotel->Numbering = $request->input("hotel").$value->id.$request->input("supplieer_id");
+                    $supplier_hotel->supplier_id = $request->input("supplier_id");
+                    $supplier_hotel->Numbering = $request->input("Numbering");
                     $supplier_hotel->save();
                 }
             }
@@ -92,8 +98,8 @@ class test01 extends Controller
             //新增資料到 供應商&飯店 中介
             $supplier_hotel = new supplier_hotel;
             $supplier_hotel->hotel_id = $hotel_company->id;
-            $supplier_hotel->supplier_id = $request->input("supplieer_id");
-            $supplier_hotel->Numbering = $request->input("hotel").$hotel_company->id.$request->input("supplieer_id");
+            $supplier_hotel->supplier_id = $request->input("supplier_id");
+            $supplier_hotel->Numbering = $request->input("hotel").$hotel_company->id.$request->input("supplier_id");
             $supplier_hotel->save();
         }
 
@@ -116,6 +122,7 @@ class test01 extends Controller
                 $room_table->room_test = $request->input("room_test");
                 $room_table->amount = $request->input("amount");
                 $room_table->currency = $request->input("currency");
+                $room_table->room_type = $request->input("Room_type");
                 $room_table->save();
             }
         }
@@ -143,16 +150,111 @@ class test01 extends Controller
     public function supplier_addpost(Request $request){
 
         //檢查是否已有此供應商
-        $currency_table_arr = supplier::whereRaw("currency_name = '".$request->input("supplier_name")."' ")->get();
+        $supplier_arr = supplier::whereRaw("name = '".$request->input("supplier_name")."' ")->get();
         
-        //無此幣別
-        if(count($currency_table_arr)==0){
-            //新增幣別
-            $currency_table = new currency_table;
-            $currency_table->Currency_name = $request->input("currency_name");
+        //無此供應商
+        if(count($supplier_arr)==0){
+            //新增供應商
+            $supplier = new supplier;
+            $supplier->name = $request->input("supplier_name");
+            $supplier->phone = $request->input("supplier_phone");
+            $supplier->address = $request->input("supplier_address");
+            $supplier->save();
+        }        
+        return redirect('test02');
+    }
+
+    //新增房型
+    public function Room_type_addpost(Request $request){
+        //檢查房型是否存在
+        $room_type_arr = room_type::whereRaw("name = '".$request->input("Room_type")."' ")->get();
+
+        //無此房型
+        if(count($room_type_arr)==0){
+            //新增房型
+            $currency_table = new room_type;
+            $currency_table->name = $request->input("Room_type");
             $currency_table->save();
         }        
         return redirect('test02');
+    }
+
+    //新增訂單
+    public function order_addpost(Request $request){
+        //產生訂單號碼
+        $order_number_v = $this->order_number_add();
+
+        //新增訂單
+        $order_table = new order_table;
+        $order_table->number = $order_number_v;
+        $order_table->save();
+
+        // dump($order_table->id);
+
+        //取得房間資訊
+        $room_type_all = room_table::all();
+        foreach ($room_type_all as $key=>$room_type){
+            if($room_type->id == $request->input("Room_Options")){
+                $room_id = $room_type->room_type;
+                $room_amount = $room_type->amount;
+                $room_currency = $room_type->currency;
+                $room_supplier_hotel_id = $room_type->supplier_hotel_id;
+                break;
+            }
+        }
+
+        //查詢供應商&飯店 取得供應商ID用
+        $supplier_hotel_v = supplier_hotel::find($room_supplier_hotel_id)->toArray();
+
+        //取得房型名稱
+        $room_type_v = room_type::find($room_id)->toArray();
+
+        //新增購買資訊
+        $hotel_shopping = new hotel_shopping;
+        $hotel_shopping->Store_Hotel_id = $request->input("hotel_id");
+        $hotel_shopping->client_id = $request->input("client_id");
+        $hotel_shopping->clients_id = $request->input("client_id").'先不理';
+        $hotel_shopping->Room_name = $room_type_v['name'];
+        $hotel_shopping->save();
+
+        // dump($hotel_shopping->id);
+
+        //新增資料到『訂單&購買 中介』表
+        $order_shopping_table = new order_shopping_table;
+        $order_shopping_table->Order_id = $order_table->id;
+        $order_shopping_table->shopping_id = $hotel_shopping->id;
+        $order_shopping_table->Type = 1;
+        $order_shopping_table->test = $room_type_v['name'].$order_table->id.$hotel_shopping->id;
+        $order_shopping_table->save();
+
+        // dump($order_shopping_table->id);
+
+
+        //新增金額資訊
+        $amount = new amount;
+        $amount->amount = $room_amount;
+        $amount->Currency = $room_currency;
+        $amount->Hotel_id = $request->input("hotel_id");
+        $amount->supplier_id = $supplier_hotel_v['supplier_id'];
+        $amount->save();
+        
+        // dump($amount->id);
+
+        order_shopping_table::find($order_shopping_table->id)->amounts()->attach($amount->id, ['Type' => '']);
+
+        return redirect('test02');
+    }
+
+    //產生訂單號碼
+    public function order_number_add(){
+        for($i = 1;$i <= 9999;$i++){
+            //檢查是否已有此訂單編號
+            $order_table_arr = order_table::whereRaw("number = '".date("Ymd").str_pad($i,4,'0',STR_PAD_LEFT)."'")->get()->take(1);
+            //沒有此訂單號碼
+            if(count($order_table_arr) == 0){
+                return date("Ymd").str_pad($i,4,'0',STR_PAD_LEFT);
+            }
+        }
     }
 
     //取得幣別資料
@@ -190,6 +292,32 @@ class test01 extends Controller
   
         return $return_v;
     }
+
+    //取得客戶名稱
+    public function client_all(){
+        $return_v = [];
+        $client_all = client_table::all();
+        foreach ($client_all as $key=>$client){
+            $return_v[$key]['name'] = $client->name;
+            $return_v[$key]['id'] = $client->id;
+            $return_v[$key]['phone'] = $client->phone;
+            $return_v[$key]['Emain'] = $client->Emain;
+        }
+  
+        return $return_v;
+    }
+
+    //取得房型名稱
+    public function room_type_all(){
+        $return_v = [];
+        $room_type_all = room_type::all();
+        foreach ($room_type_all as $key=>$room_type){
+            $return_v[$key]['name'] = $room_type->name;
+            $return_v[$key]['id'] = $room_type->id;
+        }
+  
+        return $return_v;
+    }
     
     //取得供應商關聯飯店
     public function Related_Hotelpost(Request $request){
@@ -222,7 +350,7 @@ class test01 extends Controller
 
                 $room_arr = room_table::whereRaw("supplier_hotel_id = '".$value['id']."'")->get()->toArray();
                 foreach($room_arr as $key_1=>$value_1){
-                    if($key_1!=0) $return_v .= ',';
+                    if($return_v!='') $return_v .= ',';
                     if($value_1['id']!='') $return_v .= $value_1['id'].':'.$value_1['room_test'];
                 }
             }
@@ -236,12 +364,47 @@ class test01 extends Controller
 
         $return_v = '';
 
-        $room_table_arr = room_table::find($request->input("Room_id"))->get();
-        foreach ($room_table_arr as $key=>$room){
-            $return_v = "房間資訊：房間金額：".$room->amount.",幣別：".$room->currency;
-        }
+        $room_table_arr = room_table::find($request->input("Room_id"))->toArray();
+
+        $return_v = "房間資訊：房間金額：".$room_table_arr['amount'].",幣別：".$room_table_arr['currency'];
+
         dump('@!@'.$return_v.'@!@');
     }
+
+    //取得訂單相關資訊
+    public function order_inquirepost(Request $request){
+
+        $return_v = "";
+
+        //取得訂單ID
+        $order_table_arr = order_table::whereRaw("number = '".$request->input("order_number")."'")->get()->take(1)->toArray();
+
+        //有此訂單
+        if(count($order_table_arr) != 0){
+            foreach($order_table_arr as $key=>$value){
+                //取得購買資訊
+                $order_table_arr = order_table::find($value['id'])->hotel_shoppings()->get()->toArray();
+
+                foreach($order_table_arr as $value_2){
+                    if($return_v!='') $return_v .= ',';
+
+                    //取得金額資訊
+                    $order_shopping_table_arr = order_shopping_table::find($value_2['pivot']['id'])->amounts()->get()->toArray();
+                    foreach($order_shopping_table_arr as $value3){}
+
+                    if($value_2['id']!='') $return_v .= $value_2['id'].':::'.$value_2['Store_Hotel_id'].':::'.$value_2['client_id'].':::'.$value_2['Room_name'].':::'.$value3['amount'].':::'.$value3['Currency'];
+                    
+                }
+                dump('@!@'.$return_v.'@!@');
+            }
+        }else{
+            dump('@!@無此訂單@!@');
+        }
+    }
+
+
+    
+
 
 
     public function index()

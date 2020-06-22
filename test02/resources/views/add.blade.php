@@ -19,6 +19,8 @@
     </form>
 </div>
 
+<br/>
+
 <span style="color:blue;" onclick="Show(1)">新增飯店：</span>
 <div id="Show_1" style="display:none">
     <form method="post" action="{{ url('/hotel_add') }}">
@@ -31,7 +33,13 @@
             @endforeach
         </select>
         <br />
-        2.新增飯店：<input type='text' name="hotel" id="hotel" value="" required="required" >
+        
+        2.新增飯店名稱：<input type='text' name="hotel" id="hotel" value="" required="required" >
+        ※電話地址先自動新增了
+        <br />
+        
+        3.輸入編號：<input type='text' name="Numbering" id="Numbering" value="" required="required" >
+
         <button>送出</button>
     </form>
 </div>
@@ -59,6 +67,14 @@
         <br />
 
         3.輸入房間資訊：<input type='text' name="room_test" id="room_test" value="" required="required" >
+        選擇房型：
+        <select name="Room_type" id="Room_type" required="required" >
+            <option value="">無</option>
+            @foreach($room_type_all as $key => $value)
+                <option value="{{$value['id']}}" >{{$value['name']}}</option>
+            @endforeach
+        </select>
+
         金額：<input type='text' name="amount" id="amount" value="" required="required" >
         幣別：
         <select name="currency" id="currency" required="required" >
@@ -75,22 +91,33 @@
 
 <span style="color:blue;" onclick="Show(9)">新增訂單：</span>
 <div id="Show_9" style="display:none">
-    1.選擇飯店：
-    <select name="hotel_id" id="hotel_id" onchange="ShowR('{{ csrf_token() }}', this.value)" required="required" >
-        <option value="">無</option>
-        @foreach($hotel_all as $key => $value)
-            <option value="{{$value['id']}}" >{{$value['name']}}</option>
-        @endforeach
-    </select>
-    <br />
+    <form method="post" action="{{ url('/order_add') }}">
+        {{ csrf_field() }}
+        1.選擇飯店：
+        <select name="hotel_id" id="hotel_id" onchange="ShowR('{{ csrf_token() }}', this.value)" required="required" >
+            <option value="">無</option>
+            @foreach($hotel_all as $key => $value)
+                <option value="{{$value['id']}}" >{{$value['name']}}</option>
+            @endforeach
+        </select>
+        <br />
 
-    2.挑選飯店房間：
-    <select name="Room_Options" id="Room_Options" required="required" onchange="ShowA('{{ csrf_token() }}', this.value)" ></select>
-    <br />
+        2.挑選飯店房間：
+        <select name="Room_Options" id="Room_Options" required="required" onchange="ShowA('{{ csrf_token() }}', this.value)" ></select>
+        <br />
+        <span id="test_9"></span>
+        <br />
 
-    <span id="test_9"></span>
-    <br />
-    確認送出：
+        3.訂房客戶：
+        <select name="client_id" id="client_id" required="required" >
+            <option value="">無</option>
+            @foreach($client_all as $key => $value)
+                <option value="{{$value['id']}}" >{{$value['name']}}</option>
+            @endforeach
+        </select>
+        <br />
+        <button>確認送出</button>
+    </form>
 </div>
 
 <br/>
@@ -104,6 +131,41 @@
         <button>送出</button>
     </form>
 </div>
+
+<br />
+
+<span style="color:blue;" onclick="Show(5)">查詢訂單：</span>
+<div id="Show_5" style="display:none">
+
+    訂單號碼：<input type='text' name="order_number" id="order_number" value="" required="required" >
+    <button onclick="order_inquire('{{ csrf_token() }}')">送出</button>
+
+    <span id="test_5"></span>
+</div>
+
+<br />
+
+<span style="color:blue;" onclick="Show(7)">用金額ID抓其他資料：</span>
+<div id="Show_7" style="display:none">
+
+    金額ID號碼：<input type='text' name="amount_id" id="amount_id" value="" required="required" >
+    <button onclick="amount_inquire('{{ csrf_token() }}')">送出</button>
+
+</div>
+
+<br />
+
+<span style="color:blue;" onclick="Show(6)">新增房型：</span>
+<div id="Show_6" style="display:none">
+
+    <form method="post" action="{{ url('/Room_type_add') }}">
+        {{ csrf_field() }}
+        輸入房型：<input type='text' name="Room_type" id="Room_type" value="" required="required" >
+        <button>送出</button>
+    </form>
+</div>
+
+<br />
 
 </body>
 </html>
