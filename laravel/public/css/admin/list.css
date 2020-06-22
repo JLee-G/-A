@@ -1,0 +1,44 @@
+.title {
+    text-align: center;
+    font-weight:bold;
+    font-size:30px;
+    color:rgb(81, 81, 85);
+    font-family:Microsoft JhengHei;
+    margin-bottom: 30px;
+}
+
+.frame {
+    margin:0px auto;
+    width:300px;
+}
+
+.frame_1 {
+    text-align: left;
+}
+
+.frame_2 {
+    display:inline;
+}
+
+.frame_3 {
+    text-align: center;
+}
+
+.frame_3 a {
+    font-weight:bold;
+    font-size:15px;
+    color:rgb(81, 81, 85);
+    font-family:Microsoft JhengHei;
+    text-decoration:none;
+}
+
+.frame_3 a:hover {
+    text-decoration:underline;
+    background-color:#fafafa;
+    color:gray;
+}
+
+.reel {
+    height:300px;
+    overflow-y:auto;
+}

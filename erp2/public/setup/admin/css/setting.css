@@ -1,0 +1,16 @@
+.frame_1{
+    margin:0px auto;
+    width:400px;
+    font-family:Microsoft JhengHei;
+    height:500px;
+}
+
+.reel{
+    height:150px;
+    overflow-y:auto;
+}
+
+.reel_width{
+    width:400px;
+    word-wrap:break-word;
+}
